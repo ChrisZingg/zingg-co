@@ -13,9 +13,9 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
+          server: 123.hosttech.eu
+          username: chriz
+          password: Git21Hub06!
           local-dir: ./
           server-dir: /zingg.co/httpdocs/
           exclude: |
