@@ -13,6 +13,7 @@ jobs:
           server: 123.hosttech.eu
           username: chriz
           password: ${{ secrets.FTP_PASS }}
+          protocol: ftps
           local-dir: ./
           server-dir: /zingg.co/httpdocs/
           exclude: |
