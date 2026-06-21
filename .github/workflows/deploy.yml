@@ -1,24 +1,26 @@
-﻿name: Deploy to zingg.co
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: 123.hosttech.eu
-          username: chriz
-          password: ${{ secrets.FTP_PASS }}
-          local-dir: ./
-          server-dir: /zingg.co/httpdocs/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
+﻿(
+echo name: Deploy to zingg.co
+echo.
+echo on:
+echo   push:
+echo     branches: [main]
+echo.
+echo jobs:
+echo   deploy:
+echo     runs-on: ubuntu-latest
+echo     steps:
+echo       - uses: actions/checkout@v4
+echo.
+echo       - name: FTP Deploy
+echo         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+echo         with:
+echo           server: 123.hosttech.eu
+echo           username: chriz
+echo           password: ${{ secrets.FTP_PASS }}
+echo           local-dir: ./
+echo           server-dir: /zingg.co/httpdocs/
+echo           exclude: ^|
+echo             **/.git*
+echo             **/.git*/**
+echo             .github/**
+) > .github\workflows\deploy.yml
