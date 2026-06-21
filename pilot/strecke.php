@@ -91,6 +91,7 @@ include '../includes/header.php';
 
 <script>
 const AIRPORTS = {
+  // SCHWEIZ
   LSZH: [47.458,  8.548,  'Zürich-Kloten',        'CH', true],
   LSGG: [46.238,  6.109,  'Genf-Cointrin',         'CH', true],
   LSZB: [46.914,  7.497,  'Bern-Belp',             'CH', true],
@@ -120,6 +121,7 @@ const AIRPORTS = {
   LSZF: [47.443,  8.230,  'Birrfeld',              'CH', false],
   LSZW: [46.923,  7.600,  'Thun',                  'CH', false],
   LSZN: [47.222,  8.519,  'Hausen am Albis',       'CH', false],
+  LSZK: [47.387,  8.759,  'Speck-Fehraltorf',      'CH', false],
   LSGL: [46.545,  6.618,  'Lausanne-Blécherette',  'CH', false],
   LSGE: [46.799,  6.588,  'Ecuvillens-Fribourg',   'CH', false],
   LSGT: [46.584,  7.082,  'Gruyères',              'CH', false],
@@ -133,9 +135,11 @@ const AIRPORTS = {
   LSTR: [46.600,  6.376,  'Montricher',            'CH', false],
   LSZY: [47.410,  7.051,  'Porrentruy',            'CH', false],
   LSPA: [47.600,  8.694,  'Flaach',                'CH', false],
+  LSZP: [47.480,  8.987,  'Pfyn-Brunegg',          'CH', false],
+  // DEUTSCHLAND
   EDNY: [47.671,  9.511,  'Friedrichshafen',       'D',  true],
   EDTF: [48.023,  7.832,  'Freiburg',              'D',  true],
-  EDTB: [48.794,  8.083,  'Baden-Baden/Oos',       'D',  true],
+  EDTB: [48.794,  8.083,  'Baden-Baden',           'D',  true],
   EDDS: [48.690,  9.222,  'Stuttgart',             'D',  true],
   EDDM: [48.354, 11.786,  'München',               'D',  true],
   EDMA: [48.425, 10.931,  'Augsburg',              'D',  true],
@@ -149,6 +153,7 @@ const AIRPORTS = {
   EDDF: [50.033,  8.571,  'Frankfurt',             'D',  true],
   EDDH: [53.630,  9.988,  'Hamburg',               'D',  true],
   EDDB: [52.366, 13.503,  'Berlin-Brandenburg',    'D',  true],
+  // ÖSTERREICH
   LOWI: [47.260, 11.344,  'Innsbruck',             'A',  true],
   LOIH: [47.385,  9.700,  'Hohenems-Dornbirn',     'A',  false],
   LOWS: [47.793, 13.004,  'Salzburg',              'A',  true],
@@ -158,6 +163,7 @@ const AIRPORTS = {
   LOAN: [47.843, 16.260,  'Wiener Neustadt',       'A',  false],
   LOGE: [47.029, 15.440,  'Graz',                  'A',  true],
   LOKL: [46.642, 14.338,  'Klagenfurt',            'A',  true],
+  // FRANKREICH
   LFLL: [45.726,  5.091,  'Lyon-Saint-Exupéry',    'F',  true],
   LFMN: [43.658,  7.215,  'Nizza',                 'F',  true],
   LFML: [43.439,  5.221,  'Marseille',             'F',  true],
@@ -171,6 +177,7 @@ const AIRPORTS = {
   LFPG: [49.013,  2.550,  'Paris CDG',             'F',  true],
   LFLC: [45.787,  3.169,  'Clermont-Ferrand',      'F',  true],
   LFBD: [44.828, -0.715,  'Bordeaux',              'F',  true],
+  // ITALIEN
   LIMC: [45.630,  8.723,  'Mailand-Malpensa',      'I',  true],
   LIME: [45.669,  9.704,  'Bergamo',               'I',  true],
   LIMF: [45.200,  7.649,  'Turin',                 'I',  true],
@@ -206,6 +213,11 @@ function alongTrackFraction(lat1,lon1,lat2,lon2,latP,lonP){
   return Math.max(0,Math.min(1,distNM(lat1,lon1,latP,lonP)/total));
 }
 
+function apLabel(icao){
+  const ap=AIRPORTS[icao];
+  return ap ? icao+' / '+ap[2] : icao;
+}
+
 function suggestWaypoints(){
   const dep=document.getElementById('dep').value.trim().toUpperCase();
   const arr=document.getElementById('arr').value.trim().toUpperCase();
@@ -221,19 +233,24 @@ function suggestWaypoints(){
     const [latP,lonP]=data;
     const xtd=crossTrackDistNM(lat1,lon1,lat2,lon2,latP,lonP);
     const frac=alongTrackFraction(lat1,lon1,lat2,lon2,latP,lonP);
-    if(xtd<=CORRIDOR&&frac>0.08&&frac<0.92)suggestions.push({icao,name:data[2],land:data[3],metar:data[4],frac,xtd});
+    if(xtd<=CORRIDOR&&frac>0.08&&frac<0.92)
+      suggestions.push({icao,name:data[2],land:data[3],metar:data[4],frac,xtd});
   }
   suggestions.sort((a,b)=>a.frac-b.frac);
   const box=document.getElementById('suggestions-box'),list=document.getElementById('suggestions-list');
   list.innerHTML='';
-  if(!suggestions.length){box.style.display='block';list.innerHTML='<span style="font-size:12px;color:var(--muted);font-style:italic;">Keine Plätze im Korridor gefunden.</span>';return;}
+  if(!suggestions.length){
+    box.style.display='block';
+    list.innerHTML='<span style="font-size:12px;color:var(--muted);font-style:italic;">Keine Plätze im Korridor gefunden.</span>';
+    return;
+  }
   suggestions.forEach(s=>{
     const btn=document.createElement('button');
     btn.id='sug-'+s.icao;
     btn.onclick=()=>toggleSuggestion(s.icao);
     const noM=!s.metar?'<span style="font-size:9px;color:var(--muted);background:#eee;padding:1px 4px;border-radius:2px;margin-left:4px;">∅ METAR</span>':'';
-    btn.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:5px 12px;cursor:pointer;font-family:var(--mono);font-size:12px;transition:all 0.12s;text-align:left;';
-    btn.innerHTML=`<strong>${s.icao}</strong> <span style="color:var(--sky);font-size:11px;">${s.name}</span> <span style="color:var(--muted);font-size:10px;">(${s.land}) · ${Math.round(s.xtd)} NM</span>${noM}`;
+    btn.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:6px 12px;cursor:pointer;font-family:var(--mono);font-size:12px;transition:all 0.12s;text-align:left;';
+    btn.innerHTML=`<strong>${s.icao}</strong> / <span style="color:var(--ink);">${s.name}</span> <span style="color:var(--muted);font-size:10px;">(${s.land}) · ${Math.round(s.xtd)} NM</span>${noM}`;
     list.appendChild(btn);
   });
   box.style.display='block';
@@ -291,9 +308,9 @@ function renderWaypoints(){
     span.className='wp-tag';
     span.style.cssText='display:inline-flex;align-items:center;gap:5px;background:var(--sky-lt);color:var(--sky);font-family:var(--mono);font-size:12px;font-weight:700;padding:4px 10px;border-radius:3px;';
     const ap=AIRPORTS[icao];
-    const name=ap?`<span style="font-weight:400;font-size:10px;color:var(--muted);">${ap[2]}</span>`:'';
-    const noM=ap&&!ap[4]?'<span style="font-size:9px;color:var(--muted);">∅</span>':'';
-    span.innerHTML=`${icao} ${name}${noM}<button onclick="removeWaypoint('${icao}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;">×</button>`;
+    const name=ap?` / <span style="font-weight:400;color:var(--ink);font-size:11px;">${ap[2]}</span>`:'';
+    const noM=ap&&!ap[4]?' <span style="font-size:9px;color:var(--muted);">∅</span>':'';
+    span.innerHTML=`${icao}${name}${noM}<button onclick="removeWaypoint('${icao}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 6px;line-height:1;">×</button>`;
     list.appendChild(span);
   });
 }
@@ -306,8 +323,9 @@ function updateRoutePreview(){
   const all=[dep,...waypoints,arr].filter(Boolean);
   document.getElementById('route-line').innerHTML=all.map((w,i)=>{
     const ap=AIRPORTS[w];
-    const name=ap?`<span style="font-size:9px;font-weight:400;display:block;color:rgba(44,111,168,0.8);margin-top:1px;">${ap[2]}</span>`:'';
-    return `<span class="route-wp" style="display:inline-flex;flex-direction:column;align-items:center;padding:4px 10px;">${w}${name}</span>`+(i<all.length-1?'<span class="route-arrow" style="align-self:center;">→</span>':'');
+    const name=ap?`<span style="font-size:9px;font-weight:400;display:block;color:var(--sky-mid);margin-top:1px;">${ap[2]}</span>`:'';
+    return `<span class="route-wp" style="display:inline-flex;flex-direction:column;align-items:center;padding:4px 10px;">${w}${name}</span>`
+      +(i<all.length-1?'<span class="route-arrow" style="align-self:center;">→</span>':'');
   }).join('');
   let dist=0;
   for(let i=0;i<all.length-1;i++){
@@ -344,18 +362,16 @@ function metarToHtml(icao,raw,index,total){
   const isFirst=index===0,isLast=index===total-1;
   const label=isFirst?'🛫 Abflug':isLast?'🛬 Ziel':'📍 Via';
   const ap=AIRPORTS[icao];
-  const apName=ap?ap[2]:'';
-  const apLand=ap?' · '+ap[3]:'';
+  const apName=ap?' / '+ap[2]:'';
+  const apLand=ap?' ('+ap[3]+')':'';
   const noMetarExpected=ap&&!ap[4];
+
   if(!raw)return `<div class="card" style="border-left:3px solid var(--muted);">
-    <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px;">${label}</div>
-    <div style="display:flex;align-items:baseline;gap:0.75rem;">
-      <span style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--sky);">${icao}</span>
-      <span style="font-size:14px;font-weight:500;color:var(--ink);">${apName}</span>
-      <span style="font-size:11px;color:var(--muted);">${apLand}</span>
-    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px;">${label}</div>
+    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--sky);">${icao}<span style="font-size:14px;font-weight:400;color:var(--ink);">${apName}</span> <span style="font-size:11px;color:var(--muted);font-family:var(--sans);">${apLand}</span></div>
     <div style="margin-top:0.5rem;font-size:12px;color:var(--muted);font-family:var(--mono);">${noMetarExpected?'ℹ Kein METAR — Kleinflugplatz':'⚠ Kein METAR verfügbar'}</div>
   </div>`;
+
   const p=parseMiniMetar(raw);
   const kt=p.wind?parseInt(p.wind[2]):0;
   const vm=p.vis?parseInt(p.vis[1]):9999;
@@ -370,15 +386,12 @@ function metarToHtml(icao,raw,index,total){
   const cloudStr=p.cloud?p.cloud.map(c=>{const m=c.match(/(FEW|SCT|BKN|OVC)(\d+)/);return m?m[1]+' '+(parseInt(m[2])*100)+' ft':'';}).join(', '):'CAVOK';
   const tempStr=p.temp?p.temp[1].replace('M','-')+'°/'+p.temp[2].replace('M','-')+'°':'—';
   const qnhStr=p.qnh?p.qnh[1]+' hPa':'—';
+
   return `<div class="card" style="border-left:3px solid ${col};">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
       <div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px;">${label}</div>
-        <div style="display:flex;align-items:baseline;gap:0.75rem;flex-wrap:wrap;">
-          <span style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--sky);">${icao} ${icon}</span>
-          <span style="font-size:15px;font-weight:600;color:var(--ink);">${apName}</span>
-          <span style="font-size:11px;color:var(--muted);">${apLand}</span>
-        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px;">${label} ${icon}</div>
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--sky);">${icao}<span style="font-size:14px;font-weight:400;color:var(--ink);">${apName}</span> <span style="font-size:11px;color:var(--muted);font-family:var(--sans);">${apLand}</span></div>
       </div>
       <div style="font-size:10px;font-family:var(--mono);color:var(--muted);text-align:right;max-width:45%;word-break:break-all;line-height:1.5;">${raw.substring(0,55)}…</div>
     </div>
@@ -402,10 +415,12 @@ async function startBriefing(){
   document.getElementById('metar-cards').innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--muted);">⏳ Lade METARs für '+allIcao.join(', ')+'…</div>';
   document.getElementById('ai-briefing-text').innerHTML='<span style="color:var(--muted);font-family:var(--mono);font-size:12px;">⏳ Warte auf METARs…</span>';
   document.getElementById('briefing-result').scrollIntoView({behavior:'smooth',block:'start'});
+
   const results=await Promise.all(allIcao.map(icao=>fetchMetarForIcao(icao)));
   const metarMap={};
   allIcao.forEach((icao,i)=>metarMap[icao]=results[i]);
   document.getElementById('metar-cards').innerHTML=allIcao.map((icao,i)=>metarToHtml(icao,metarMap[icao],i,allIcao.length)).join('');
+
   const timeStr=depTime?new Date(depTime).toLocaleString('de-CH',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'unbekannte Zeit';
   const metarLines=allIcao.map((icao,i)=>{
     const role=i===0?'Abflug':i===allIcao.length-1?'Ziel':'Via';
@@ -413,10 +428,11 @@ async function startBriefing(){
     const name=ap?' ('+ap[2]+')':'';
     return `${role} ${icao}${name}: ${metarMap[icao]||(ap&&!ap[4]?'Kein METAR (Kleinflugplatz)':'Kein METAR')}`;
   }).join('\n');
+
   const prompt=`Du bist ein erfahrener Fluglehrer und Meteorologe für die Schweizer Luftfahrt.
 Erstelle eine knappe, praxisorientierte Wetterbeurteilung auf Deutsch für folgenden Flug:
 
-Route: ${allIcao.join(' → ')}
+Route: ${allIcao.map(i=>apLabel(i)).join(' → ')}
 Geplante Abflugzeit: ${timeStr}
 
 Aktuelle METARs:
@@ -428,20 +444,30 @@ Beurteile:
 3. Go / Caution / No-Go Empfehlung mit kurzer Begründung
 
 Schreibe in natürlichem Deutsch, als würdest du mit einem PPL-Piloten sprechen. Maximal 200 Wörter.`;
+
   document.getElementById('ai-briefing-text').innerHTML='<span style="color:var(--muted);font-family:var(--mono);font-size:12px;">⏳ KI-Beurteilung wird erstellt…</span>';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,messages:[{role:'user',content:prompt}]})
+    });
     const data=await resp.json();
-    const text=(data.content?.[0]?.text||'Keine Antwort.').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:0.75rem;">').replace(/\n/g,'<br>');
+    const text=(data.content?.[0]?.text||'Keine Antwort.')
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n\n/g,'</p><p style="margin-top:0.75rem;">')
+      .replace(/\n/g,'<br>');
     document.getElementById('ai-briefing-text').innerHTML='<p>'+text+'</p>';
   }catch(e){
-    document.getElementById('ai-briefing-text').innerHTML='<span style="color:var(--muted);font-family:var(--mono);font-size:12px;">⚠ KI-Beurteilung nicht verfügbar</span>';
+    document.getElementById('ai-briefing-text').innerHTML='<span style="color:var(--muted);font-family:var(--mono);font-size:12px;">⚠ KI-Beurteilung nicht verfügbar ('+e.message+')</span>';
   }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
   ['dep','arr'].forEach(id=>{
-    document.getElementById(id).addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();updateRoutePreview();});
+    document.getElementById(id).addEventListener('input',e=>{
+      e.target.value=e.target.value.toUpperCase();updateRoutePreview();
+    });
   });
   document.getElementById('wp-input').addEventListener('keydown',e=>{
     e.target.value=e.target.value.toUpperCase();
