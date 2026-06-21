@@ -10,7 +10,7 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: 123.hosttech.eu
+          server: www.zingg.co
           username: chriz
           password: Git21Hub06!
           local-dir: ./
