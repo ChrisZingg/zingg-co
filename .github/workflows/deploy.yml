@@ -12,7 +12,7 @@ jobs:
         with:
           server: 123.hosttech.eu
           username: chriz
-          password: ${{ secrets.FTP_PASS }}
+          password: Git21Hub06!
           local-dir: ./
           server-dir: /zingg.co/httpdocs/
           exclude: |
