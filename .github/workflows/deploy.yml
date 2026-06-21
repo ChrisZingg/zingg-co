@@ -8,14 +8,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: 123.hosttech.eu
           username: chriz
-          password: Git21Hub06!
+          password: ${{ secrets.FTP_PASS }}
           local-dir: ./
           server-dir: /zingg.co/httpdocs/
           exclude: |
