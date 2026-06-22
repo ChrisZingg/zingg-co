@@ -91,7 +91,6 @@ include '../includes/header.php';
 
 <script>
 const AIRPORTS = {
-  // SCHWEIZ
   LSZH: [47.458,  8.548,  'Zürich-Kloten',        'CH', true],
   LSGG: [46.238,  6.109,  'Genf-Cointrin',         'CH', true],
   LSZB: [46.914,  7.497,  'Bern-Belp',             'CH', true],
@@ -136,7 +135,6 @@ const AIRPORTS = {
   LSZY: [47.410,  7.051,  'Porrentruy',            'CH', false],
   LSPA: [47.600,  8.694,  'Flaach',                'CH', false],
   LSZP: [47.480,  8.987,  'Pfyn-Brunegg',          'CH', false],
-  // DEUTSCHLAND
   EDNY: [47.671,  9.511,  'Friedrichshafen',       'D',  true],
   EDTF: [48.023,  7.832,  'Freiburg',              'D',  true],
   EDTB: [48.794,  8.083,  'Baden-Baden',           'D',  true],
@@ -153,7 +151,6 @@ const AIRPORTS = {
   EDDF: [50.033,  8.571,  'Frankfurt',             'D',  true],
   EDDH: [53.630,  9.988,  'Hamburg',               'D',  true],
   EDDB: [52.366, 13.503,  'Berlin-Brandenburg',    'D',  true],
-  // ÖSTERREICH
   LOWI: [47.260, 11.344,  'Innsbruck',             'A',  true],
   LOIH: [47.385,  9.700,  'Hohenems-Dornbirn',     'A',  false],
   LOWS: [47.793, 13.004,  'Salzburg',              'A',  true],
@@ -163,7 +160,6 @@ const AIRPORTS = {
   LOAN: [47.843, 16.260,  'Wiener Neustadt',       'A',  false],
   LOGE: [47.029, 15.440,  'Graz',                  'A',  true],
   LOKL: [46.642, 14.338,  'Klagenfurt',            'A',  true],
-  // FRANKREICH
   LFLL: [45.726,  5.091,  'Lyon-Saint-Exupéry',    'F',  true],
   LFMN: [43.658,  7.215,  'Nizza',                 'F',  true],
   LFML: [43.439,  5.221,  'Marseille',             'F',  true],
@@ -177,7 +173,6 @@ const AIRPORTS = {
   LFPG: [49.013,  2.550,  'Paris CDG',             'F',  true],
   LFLC: [45.787,  3.169,  'Clermont-Ferrand',      'F',  true],
   LFBD: [44.828, -0.715,  'Bordeaux',              'F',  true],
-  // ITALIEN
   LIMC: [45.630,  8.723,  'Mailand-Malpensa',      'I',  true],
   LIME: [45.669,  9.704,  'Bergamo',               'I',  true],
   LIMF: [45.200,  7.649,  'Turin',                 'I',  true],
@@ -190,6 +185,7 @@ const AIRPORTS = {
   LIPX: [45.396, 10.888,  'Verona',                'I',  true],
   LIPH: [45.649, 12.194,  'Treviso',               'I',  true],
 };
+
 function toRad(d){return d*Math.PI/180;}
 function distNM(lat1,lon1,lat2,lon2){
   const R=3440.065,dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1);
@@ -212,7 +208,6 @@ function alongTrackFraction(lat1,lon1,lat2,lon2,latP,lonP){
   if(total<1)return 0.5;
   return Math.max(0,Math.min(1,distNM(lat1,lon1,latP,lonP)/total));
 }
-
 function apLabel(icao){
   const ap=AIRPORTS[icao];
   return ap ? icao+' / '+ap[2] : icao;
